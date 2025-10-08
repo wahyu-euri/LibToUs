@@ -1,0 +1,151 @@
+/* Extra small devices (phones, 480px and down) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 var(--space-md);
+  }
+
+  h1 {
+    font-size: var(--font-size-xxl);
+  }
+
+  h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  .btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+  }
+
+  .card {
+    margin-bottom: var(--space-md);
+  }
+}
+
+/* Small devices (phones, 768px and down) */
+@media (max-width: 768px) {
+  .book-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modal-content {
+    margin: var(--space-md);
+    width: calc(100% - var(--space-xl));
+  }
+}
+
+/* Medium devices (tablets, 1024px and down) */
+@media (max-width: 1024px) {
+  .book-detail-container {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    display: none;
+  }
+}
+
+/* Large devices (desktops, 1200px and down) */
+@media (max-width: 1200px) {
+  .container {
+    max-width: 100%;
+    padding: 0 var(--space-lg);
+  }
+}
+
+/* Print styles */
+@media print {
+  .header,
+  .footer,
+  .btn,
+  .action-buttons {
+    display: none !important;
+  }
+
+  .main-content {
+    padding-top: 0;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .book-card-image img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-white: #1a1a1a;
+    --text-dark: #ffffff;
+    --text-medium: #cccccc;
+    --text-light: #999999;
+    --border-light: #333333;
+    --background-light: #2d2d2d;
+    --background-white: #1a1a1a;
+  }
+}
+
+/* Orientation specific */
+@media (orientation: landscape) and (max-height: 500px) {
+  .auth-container {
+    padding: var(--space-md);
+  }
+
+  .auth-card {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Touch device improvements */
+@media (hover: none) and (pointer: coarse) {
+  .btn,
+  .nav-link,
+  .sidebar-link {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .book-card {
+    cursor: default;
+  }
+
+  .book-card:hover {
+    transform: none;
+  }
+}
