@@ -13,9 +13,12 @@ const BookFilter = ({ onFilterChange, currentFilters }) => {
     const fetchCategories = async () => {
       try {
         const response = await bookService.getCategories();
-        setCategories(response.data);
+        // Pastikan categories adalah array
+        const categoriesData = Array.isArray(response.data) ? response.data : [];
+        setCategories(categoriesData);
       } catch (error) {
         console.error('Error fetching categories:', error);
+        setCategories([]);
       }
     };
 
@@ -23,9 +26,12 @@ const BookFilter = ({ onFilterChange, currentFilters }) => {
   }, []);
 
   const handleFilterChange = (key, value) => {
+    // Pastikan value tidak null/undefined
+    const safeValue = value || '';
+    
     const newFilters = {
       ...filters,
-      [key]: value
+      [key]: safeValue
     };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -37,7 +43,7 @@ const BookFilter = ({ onFilterChange, currentFilters }) => {
         <label htmlFor="category">Category</label>
         <select
           id="category"
-          value={filters.category}
+          value={filters.category || 'all'}
           onChange={(e) => handleFilterChange('category', e.target.value)}
           className="form-select"
         >
@@ -54,7 +60,7 @@ const BookFilter = ({ onFilterChange, currentFilters }) => {
         <label htmlFor="sort">Sort By</label>
         <select
           id="sort"
-          value={filters.sort}
+          value={filters.sort || 'title'}
           onChange={(e) => handleFilterChange('sort', e.target.value)}
           className="form-select"
         >
@@ -70,7 +76,7 @@ const BookFilter = ({ onFilterChange, currentFilters }) => {
         <label htmlFor="order">Order</label>
         <select
           id="order"
-          value={filters.order}
+          value={filters.order || 'asc'}
           onChange={(e) => handleFilterChange('order', e.target.value)}
           className="form-select"
         >

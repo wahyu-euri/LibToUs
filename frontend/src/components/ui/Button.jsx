@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 const Button = ({ 
   children, 
@@ -10,16 +10,16 @@ const Button = ({
   className = '',
   ...props 
 }) => {
-  const baseClass = 'btn';
-  const variantClass = `btn-${variant}`;
-  const sizeClass = `btn-${size}`;
+  const baseClass = 'btn'
+  const variantClass = `btn-${variant}`
+  const sizeClass = `btn-${size}`
   
   const classes = [
     baseClass,
     variantClass,
     sizeClass,
     className
-  ].filter(Boolean).join(' ');
+  ].filter(Boolean).join(' ')
 
   return (
     <button
@@ -31,7 +31,7 @@ const Button = ({
       {loading && <span className="loading-spinner"></span>}
       {children}
     </button>
-  );
-};
+  )
+}
 
-export default Button;
+export default Button

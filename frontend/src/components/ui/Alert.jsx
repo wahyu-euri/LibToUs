@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 const Alert = ({ 
   type = 'info', 
@@ -6,9 +6,9 @@ const Alert = ({
   onClose,
   className = '' 
 }) => {
-  if (!message) return null;
+  if (!message) return null
 
-  const alertClass = `alert alert-${type} ${className}`;
+  const alertClass = `alert alert-${type} ${className}`
 
   return (
     <div className={alertClass}>
@@ -21,7 +21,7 @@ const Alert = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Alert;
+export default Alert

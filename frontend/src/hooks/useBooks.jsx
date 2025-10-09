@@ -17,19 +17,31 @@ export const useBooks = (initialFilters = {}) => {
     setError(null);
 
     try {
-      const response = await bookService.getBooks({
-        page,
-        ...newFilters
+      // Clean filters - hapus nilai kosong
+      const cleanFilters = {};
+      Object.keys(newFilters).forEach(key => {
+        if (newFilters[key] !== null && newFilters[key] !== undefined && newFilters[key] !== '') {
+          cleanFilters[key] = newFilters[key];
+        }
       });
 
-      setBooks(response.data.data || response.data);
+      const response = await bookService.getBooks({
+        page,
+        ...cleanFilters
+      });
+
+      const booksData = response.data.data || response.data;
+      setBooks(Array.isArray(booksData) ? booksData : []);
+      
       setPagination({
         currentPage: response.data.current_page || page,
         totalPages: response.data.last_page || 1,
-        totalItems: response.data.total || response.data.length
+        totalItems: response.data.total || (Array.isArray(booksData) ? booksData.length : 0)
       });
     } catch (err) {
+      console.error('Error fetching books:', err);
       setError(err.response?.data?.message || 'Failed to fetch books');
+      setBooks([]);
     } finally {
       setLoading(false);
     }
@@ -40,12 +52,21 @@ export const useBooks = (initialFilters = {}) => {
   }, []);
 
   const updateFilters = (newFilters) => {
-    setFilters(newFilters);
-    fetchBooks(1, newFilters);
+    const cleanFilters = {};
+    Object.keys(newFilters).forEach(key => {
+      if (newFilters[key] !== null && newFilters[key] !== undefined && newFilters[key] !== '') {
+        cleanFilters[key] = newFilters[key];
+      }
+    });
+    
+    setFilters(cleanFilters);
+    fetchBooks(1, cleanFilters);
   };
 
   const changePage = (page) => {
-    fetchBooks(page, filters);
+    if (page >= 1 && page <= pagination.totalPages) {
+      fetchBooks(page, filters);
+    }
   };
 
   const refreshBooks = () => {

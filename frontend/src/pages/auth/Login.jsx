@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import Input from '../../components/ui/Input';
-import Button from '../../components/ui/Button';
-import Alert from '../../components/ui/Alert';
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
+import { useNavigate } from "react-router-dom";
+import Input from '../../components/ui/Input'
+import Button from '../../components/ui/Button'
+import Alert from '../../components/ui/Alert'
+import "../../styles/Auth.css"
 
 const Login = () => {
   const [formData, setFormData] = useState({

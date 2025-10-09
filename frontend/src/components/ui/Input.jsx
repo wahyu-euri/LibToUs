@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 const Input = ({
   label,
@@ -33,7 +33,7 @@ const Input = ({
       />
       {error && <span className="error-message">{error}</span>}
     </div>
-  );
-};
+  )
+}
 
-export default Input;
+export default Input
