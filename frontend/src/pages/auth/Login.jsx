@@ -26,7 +26,7 @@ const Login = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate(result.user.role === 'admin' ? '/admin/dashboard' : '/dashboard');
+      navigate(result.user.role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
     } else {
       // backend might return validation errors (object)
       const err = typeof result.error === 'string' ? result.error : JSON.stringify(result.error);

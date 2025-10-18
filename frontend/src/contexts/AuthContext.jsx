@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { authService } from '../services/auth';
+import { authService } from "../services/auth";
 
 export const AuthContext = createContext();
 
@@ -8,14 +8,14 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
     if (token && userData) {
       try {
         setUser(JSON.parse(userData));
-      } catch (e) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+      } catch {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
     }
     setLoading(false);
@@ -25,14 +25,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.login(credentials);
       if (data.token) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
         setUser(data.user);
         return { success: true, user: data.user };
       }
-      return { success: false, error: data.message || 'Login failed' };
+      return { success: false, error: data.message || "Login failed" };
     } catch (error) {
-      const message = error.response?.data?.message || error.message || 'Login error';
+      const message =
+        error.response?.data?.message || error.message || "Login error";
       return { success: false, error: message };
     }
   };
@@ -41,14 +42,18 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.register(userData);
       if (data.token) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
         setUser(data.user);
         return { success: true, user: data.user };
       }
-      return { success: false, error: data.message || 'Register failed' };
+      return { success: false, error: data.message || "Register failed" };
     } catch (error) {
-      const message = error.response?.data?.errors || error.response?.data?.message || error.message || 'Registration error';
+      const message =
+        error.response?.data?.errors ||
+        error.response?.data?.message ||
+        error.message ||
+        "Registration error";
       return { success: false, error: message };
     }
   };
@@ -57,12 +62,12 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
     } catch (err) {
-      // ignore server errors, still clear local
-      console.warn('Logout error (ignored):', err);
+      console.warn("Logout error (ignored):", err);
     } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       setUser(null);
+      return { success: true };
     }
   };
 

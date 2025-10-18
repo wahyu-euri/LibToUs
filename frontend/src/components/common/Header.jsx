@@ -18,24 +18,30 @@ const Header = () => {
           <nav className="nav">
             {user ? (
               <>
-                {/* Dashboard selalu jadi menu pertama */}
-                <NavLink to="/dashboard" className="nav-link">
-                  Dashboard
-                </NavLink>
-
-                {/* Menu lainnya */}
-                <NavLink to="/catalog" className="nav-link">
-                  Books
-                </NavLink>
-                <NavLink to="/current-borrows" className="nav-link">
-                  My Books
-                </NavLink>
-
-                {/* Menu admin */}
-                {user.role === "admin" && (
-                  <NavLink to="/admin/books" className="nav-link admin-link">
-                    Admin
-                  </NavLink>
+                {user.role === "admin" ? (
+                  <>
+                    <NavLink to="/admin/dashboard" className="nav-link">
+                      Dashboard
+                    </NavLink>
+                    <NavLink to="/admin/books" className="nav-link">
+                      Manage Books
+                    </NavLink>
+                    <NavLink to="/admin/users" className="nav-link">
+                      Manage Users
+                    </NavLink>
+                  </>
+                ) : (
+                  <>
+                    <NavLink to="/user/dashboard" className="nav-link">
+                      Dashboard
+                    </NavLink>
+                    <NavLink to="/catalog" className="nav-link">
+                      Books
+                    </NavLink>
+                    <NavLink to="/current-borrows" className="nav-link">
+                      My Books
+                    </NavLink>
+                  </>
                 )}
               </>
             ) : (
