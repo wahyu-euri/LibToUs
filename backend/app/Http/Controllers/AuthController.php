@@ -37,7 +37,7 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $user,
-            'access_token' => $token,
+            'token' => $token,
             'token_type' => 'Bearer'
         ], Response::HTTP_CREATED);
     }
@@ -73,14 +73,20 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $user,
-            'access_token' => $token,
+            'token' => $token,
             'token_type' => 'Bearer'
         ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        // revoke current token
+        if ($request->user() && $request->user()->currentAccessToken()) {
+            $request->user()->currentAccessToken()->delete();
+        } else {
+            // revoke all tokens as fallback
+            $request->user()?->tokens()?->delete();
+        }
 
         return response()->json([
             'message' => 'Logged out successfully'

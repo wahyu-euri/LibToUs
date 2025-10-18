@@ -1,104 +1,76 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { authService } from '../services/auth';
 
-const AuthContext = createContext();
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
     if (token && userData) {
       try {
         setUser(JSON.parse(userData));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
+      } catch (e) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
     }
-    
     setLoading(false);
   }, []);
 
   const login = async (credentials) => {
     try {
-      // Simulate API call - nanti diganti dengan API real
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockUser = {
-        id: 1,
-        username: credentials.login,
-        email: `${credentials.login}@example.com`,
-        role: 'user'
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('token', 'mock-token');
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      
-      return { success: true, user: mockUser };
+      const data = await authService.login(credentials);
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+        return { success: true, user: data.user };
+      }
+      return { success: false, error: data.message || 'Login failed' };
     } catch (error) {
-      return { 
-        success: false, 
-        error: 'Login failed' 
-      };
+      const message = error.response?.data?.message || error.message || 'Login error';
+      return { success: false, error: message };
     }
   };
 
   const register = async (userData) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockUser = {
-        id: Date.now(),
-        username: userData.username,
-        email: userData.email,
-        role: userData.role || 'user'
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('token', 'mock-token');
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      
-      return { success: true, user: mockUser };
+      const data = await authService.register(userData);
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+        return { success: true, user: data.user };
+      }
+      return { success: false, error: data.message || 'Register failed' };
     } catch (error) {
-      return { 
-        success: false, 
-        error: 'Registration failed' 
-      };
+      const message = error.response?.data?.errors || error.response?.data?.message || error.message || 'Registration error';
+      return { success: false, error: message };
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  };
-
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (err) {
+      // ignore server errors, still clear local
+      console.warn('Logout error (ignored):', err);
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);

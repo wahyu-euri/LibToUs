@@ -5,24 +5,29 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\BorrowController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReviewController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+/*
+| Public routes
+*/
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Public book endpoints
+Route::get('/books', [BookController::class, 'index']);
+Route::get('/books/{id}', [BookController::class, 'show']);
+Route::get('/books/categories', [BookController::class, 'getCategories']);
+Route::get('/books/featured', [BookController::class, 'getFeaturedBooks']);
+Route::get('/books/popular', [BookController::class, 'getPopularBooks']);
+
+/*
+| Protected routes
+*/
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 
-    // Books (public)
-    Route::get('/books', [BookController::class, 'index']);
-    Route::get('/books/categories', [BookController::class, 'getCategories']);
-    Route::get('/books/featured', [BookController::class, 'getFeaturedBooks']);
-    Route::get('/books/popular', [BookController::class, 'getPopularBooks']);
-    Route::get('/books/{id}', [BookController::class, 'show']);
-
-    // User routes
+    // User routes (require 'user' middleware)
     Route::middleware('user')->group(function () {
         Route::post('/borrows', [BorrowController::class, 'store']);
         Route::get('/user/borrows', [BorrowController::class, 'userBorrows']);
@@ -35,7 +40,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user/saved-books', [BorrowController::class, 'getSavedBooks']);
         Route::delete('/saved-books/{id}', [BorrowController::class, 'removeSavedBook']);
 
-        // Profile management
         Route::put('/user/profile', [UserController::class, 'updateProfile']);
         Route::put('/user/password', [UserController::class, 'changePassword']);
     });

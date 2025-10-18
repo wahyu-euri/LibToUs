@@ -5,26 +5,24 @@ import { resolve } from 'path'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
-    host: 'localhost',
-    hmr: {
-
-    },
+    host: '127.0.0.1',
+    port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
-        secure: false
+        secure: false,
+      },
+      '/sanctum': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
       }
     }
   },
-  build: {
-    outDir: 'dist',
-    sourcemap: false
-  },
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src')
-    }
-  }
+      '@': resolve(__dirname, 'src'),
+    },
+  },
 })

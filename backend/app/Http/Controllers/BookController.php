@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Schema;
 
 class BookController extends Controller
 {
@@ -14,152 +13,116 @@ class BookController extends Controller
     {
         $query = Book::query();
 
-        // Filter by category
-        if ($request->has('category') && $request->category !== 'all') {
-            $query->where('category', $request->category);
-        }
-
-        // Search
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('author', 'like', "%{$search}%")
-                  ->orWhere('isbn', 'like', "%{$search}%");
+                  ->orWhere('author', 'like', "%{$search}%");
             });
         }
 
-        // Sort
-        $sort = $request->get('sort', 'title');
-        $order = $request->get('order', 'asc');
-        $query->orderBy($sort, $order);
-
-        $books = $query->paginate(12);
+        $books = $query->latest()->get();
 
         return response()->json($books);
     }
 
+    public function show($id)
+    {
+        $book = Book::find($id);
+
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json($book);
+    }
+
+    public function getFeaturedBooks()
+    {
+        try {
+            // if you have is_featured column
+            if (Schema::hasColumn('books', 'is_featured')) {
+                $books = Book::where('is_featured', true)->take(8)->get();
+            } else {
+                // fallback by rating or random
+                $books = Book::orderByDesc('rating')->take(8)->get();
+                if ($books->isEmpty()) {
+                    $books = Book::inRandomOrder()->take(8)->get();
+                }
+            }
+
+            return response()->json($books);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to get featured books', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getPopularBooks()
+    {
+        try {
+            if (Schema::hasColumn('books', 'views')) {
+            $books = Book::orderByDesc('views')->take(8)->get();
+            } else {
+                // fallback by review_count or random
+                $books = Book::orderByDesc('review_count')->take(8)->get();
+                if ($books->isEmpty()) {
+                    $books = Book::inRandomOrder()->take(8)->get();
+                }
+            }
+
+            return response()->json($books);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to get popular books', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getCategories()
+    {
+        try {
+            // if category is a column
+            $categories = Book::select('category')->distinct()->pluck('category');
+            return response()->json($categories);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to get categories', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    // Admin methods (store, update, destroy) - basic implementations
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $data = $request->validate([
             'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'isbn' => 'required|string|unique:books',
-            'publisher' => 'required|string|max:255',
-            'publication_year' => 'required|integer|min:1000|max:' . date('Y'),
-            'category' => 'required|string|max:255',
-            'description' => 'required|string',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'total_copies' => 'required|integer|min:1'
+            'author' => 'nullable|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'is_featured' => 'nullable|boolean',
+            'views' => 'nullable|integer',
+            'rating' => 'nullable|numeric'
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        $bookData = $request->except('cover_image');
-
-        if ($request->hasFile('cover_image')) {
-            $imagePath = $request->file('cover_image')->store('book_covers', 'public');
-            $bookData['cover_image'] = basename($imagePath);
-        }
-
-        $bookData['available_copies'] = $bookData['total_copies'];
-
-        $book = Book::create($bookData);
+        $book = Book::create($data);
 
         return response()->json($book, Response::HTTP_CREATED);
     }
 
-    public function show($id)
-    {
-        $book = Book::with(['reviews.user', 'borrows.user'])->findOrFail($id);
-        return response()->json($book);
-    }
-
     public function update(Request $request, $id)
     {
-        $book = Book::findOrFail($id);
-
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'author' => 'sometimes|required|string|max:255',
-            'isbn' => 'sometimes|required|string|unique:books,isbn,' . $id,
-            'publisher' => 'sometimes|required|string|max:255',
-            'publication_year' => 'sometimes|required|integer|min:1000|max:' . date('Y'),
-            'category' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'total_copies' => 'sometimes|required|integer|min:1'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        $book = Book::find($id);
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $bookData = $request->except('cover_image');
-
-        if ($request->hasFile('cover_image')) {
-            // Delete old image
-            if ($book->cover_image) {
-                Storage::disk('public')->delete('book_covers/' . $book->cover_image);
-            }
-
-            $imagePath = $request->file('cover_image')->store('book_covers', 'public');
-            $bookData['cover_image'] = basename($imagePath);
-        }
-
-        if (isset($bookData['total_copies'])) {
-            $borrowedCount = $book->borrows()->whereIn('status', ['borrowed', 'overdue'])->count();
-            $bookData['available_copies'] = max(0, $bookData['total_copies'] - $borrowedCount);
-        }
-
-        $book->update($bookData);
-
+        $book->update($request->all());
         return response()->json($book);
     }
 
     public function destroy($id)
     {
-        $book = Book::findOrFail($id);
-
-        // Delete cover image
-        if ($book->cover_image) {
-            Storage::disk('public')->delete('book_covers/' . $book->cover_image);
+        $book = Book::find($id);
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], Response::HTTP_NOT_FOUND);
         }
 
         $book->delete();
-
         return response()->json(['message' => 'Book deleted successfully']);
-    }
-
-    public function getCategories()
-    {
-        $categories = Book::distinct()->pluck('category');
-        return response()->json($categories);
-    }
-
-    public function getFeaturedBooks()
-    {
-        $books = Book::orderBy('rating', 'desc')
-                    ->orderBy('review_count', 'desc')
-                    ->limit(8)
-                    ->get();
-
-        return response()->json($books);
-    }
-
-    public function getPopularBooks()
-    {
-        $books = Book::withCount('borrows')
-                    ->orderBy('borrows_count', 'desc')
-                    ->limit(8)
-                    ->get();
-
-        return response()->json($books);
     }
 }

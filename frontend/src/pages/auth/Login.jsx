@@ -1,28 +1,20 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useAuth } from '../../contexts/AuthContext'
-import { useNavigate } from "react-router-dom";
-import Input from '../../components/ui/Input'
-import Button from '../../components/ui/Button'
-import Alert from '../../components/ui/Alert'
-import "../../styles/Auth.css"
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
+import Alert from '../../components/ui/Alert';
+import "../../styles/Auth.css";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    login: '',
-    password: ''
-  });
+  const [formData, setFormData] = useState({ login: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     setError('');
   };
 
@@ -30,16 +22,16 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const result = await login(formData);
-    
+    setLoading(false);
+
     if (result.success) {
       navigate(result.user.role === 'admin' ? '/admin/dashboard' : '/dashboard');
     } else {
-      setError(result.error);
+      // backend might return validation errors (object)
+      const err = typeof result.error === 'string' ? result.error : JSON.stringify(result.error);
+      setError(err);
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -73,11 +65,7 @@ const Login = () => {
             placeholder="Enter your password"
           />
 
-          <Button
-            type="submit"
-            loading={loading}
-            className="auth-button"
-          >
+          <Button type="submit" loading={loading} className="auth-button">
             Sign In
           </Button>
         </form>

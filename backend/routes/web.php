@@ -9,3 +9,7 @@ Route::get('/', function () {
         'status' => 'running'
     ];
 });
+
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->json(['message' => 'CSRF cookie set']);
+});
