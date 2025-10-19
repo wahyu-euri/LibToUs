@@ -8,6 +8,7 @@ import Pagination from '../../components/common/Pagination';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
 import { bookService } from '../../services/books';
+import "../../styles/AdminBooks.css";
 
 const AdminBooks = () => {
   const [searchTerm, setSearchTerm] = useState('');

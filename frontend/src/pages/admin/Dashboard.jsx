@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { bookService } from '../../services/books';
 import { borrowService } from '../../services/borrows';
 import { userService } from '../../services/users';
+import "../../styles/Dashboard.css";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({

@@ -36,10 +36,13 @@ const Header = () => {
                       Dashboard
                     </NavLink>
                     <NavLink to="/catalog" className="nav-link">
-                      Books
+                      Book Catalog
                     </NavLink>
                     <NavLink to="/current-borrows" className="nav-link">
-                      My Books
+                      Borrow Books
+                    </NavLink>
+                    <NavLink to="/saved-books" className="nav-link">
+                      Saved Books
                     </NavLink>
                   </>
                 )}

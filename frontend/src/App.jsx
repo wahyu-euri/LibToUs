@@ -10,6 +10,9 @@ import Register from './pages/auth/Register';
 import UserDashboard from './pages/user/Dashboard';
 import BookCatalog from './pages/user/BookCatalog';
 import BookDetail from './pages/user/BookDetail';
+import BorrowHistory from './pages/user/BorrowHistory';
+import SavedBooks from './pages/user/SavedBooks';
+import AccountSettings from './pages/user/AccountSettings';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -20,6 +23,7 @@ import ManageUsers from './pages/admin/Users';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import CurrentBorrows from './pages/user/CurrentBorrows';
 
 // Error Boundary
 class ErrorBoundary extends React.Component {
@@ -107,6 +111,38 @@ function AppRoutes() {
             element={
               <ProtectedRoute allowedRoles={['user']}>
                 <BookDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/current-borrows"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <CurrentBorrows/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/saved-books"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <SavedBooks />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account-settings"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <AccountSettings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/borrow-history"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <BorrowHistory />
               </ProtectedRoute>
             }
           />
