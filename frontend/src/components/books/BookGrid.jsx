@@ -2,6 +2,7 @@ import React from 'react';
 import BookCard from './BookCard';
 import LoadingSpinner from '../common/LoadingSpinner';
 
+
 const BookGrid = ({ books, loading = false, className = '' }) => {
   if (loading) {
     return <LoadingSpinner text="Loading books..." />;

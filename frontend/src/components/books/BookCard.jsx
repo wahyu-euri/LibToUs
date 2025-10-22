@@ -17,10 +17,10 @@ const BookCard = ({ book }) => {
       <Link to={`/book/${id}`} className="book-card-link">
         <div className="book-card-image">
           <img 
-            src={cover_image || '/images/default-book-cover.jpg'} 
+            src={cover_image || ''} 
             alt={title}
             onError={(e) => {
-              e.target.src = '/images/default-book-cover.jpg';
+              e.target.src = '';
             }}
           />
           {available_copies === 0 && (

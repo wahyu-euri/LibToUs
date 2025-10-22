@@ -51,17 +51,17 @@ export const bookService = {
     if (!id || isNaN(parseInt(id))) {
       return Promise.reject(new Error('Invalid book ID'));
     }
-    return api.delete(`/books/${id}`);
+    return api.delete(`/api/books/${id}`);
   },
 
   // Get categories
-  getCategories: () => api.get('/books/categories'),
+  getCategories: () => api.get('/api/books/categories'),
 
   // Get featured books
-  getFeaturedBooks: () => api.get('/books/featured'),
+  getFeaturedBooks: () => api.get('/api/books/featured'),
 
   // Get popular books
-  getPopularBooks: () => api.get('/books/popular'),
+  getPopularBooks: () => api.get('/api/books/popular'),
 
   // Save book to user's list
   saveBook: (bookId) => {

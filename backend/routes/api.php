@@ -42,6 +42,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::put('/user/profile', [UserController::class, 'updateProfile']);
         Route::put('/user/password', [UserController::class, 'changePassword']);
+
+        Route::get('/books/featured', [BookController::class, 'getFeaturedBooks']);
+        Route::get('/books/popular', [BookController::class, 'getPopularBooks']);
+        Route::get('/books/categories', [BookController::class, 'getCategories']);
     });
 
     // Admin routes

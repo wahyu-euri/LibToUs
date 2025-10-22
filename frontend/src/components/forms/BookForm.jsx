@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
+import './styles/Form.css';
 
 const BookForm = ({ 
   onSubmit, 
@@ -8,6 +9,7 @@ const BookForm = ({
   loading = false,
   submitText = "Add Book" 
 }) => {
+  console.log("BookForm loaded, onSubmit:", onSubmit);
   const [formData, setFormData] = useState({
     title: '',
     author: '',

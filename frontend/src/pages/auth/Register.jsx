@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
-import "../../styles/Auth.css";
+import "./styles/Auth.css";
 
 const Register = () => {
   const [formData, setFormData] = useState({
