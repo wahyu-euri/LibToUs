@@ -1,29 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import Input from '../ui/Input';
-import Button from '../ui/Button';
-import './styles/Form.css';
+import React, { useState, useEffect } from "react";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
+import "./styles/Form.css";
 
-const BookForm = ({ 
-  onSubmit, 
-  initialData = {}, 
+const BookForm = ({
+  onSubmit,
+  initialData = {},
   loading = false,
-  submitText = "Add Book" 
+  submitText = "Add Book",
 }) => {
-  console.log("BookForm loaded, onSubmit:", onSubmit);
   const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    isbn: '',
-    publisher: '',
+    title: "",
+    author: "",
+    isbn: "",
+    publisher: "",
     publication_year: new Date().getFullYear(),
-    category: '',
-    description: '',
+    category: "",
+    description: "",
     total_copies: 1,
     cover_image: null,
-    ...initialData
+    ...initialData,
   });
 
-  const [coverPreview, setCoverPreview] = useState(initialData.cover_image || '');
+  const [coverPreview, setCoverPreview] = useState(
+    initialData.cover_image || ""
+  );
 
   useEffect(() => {
     if (initialData.cover_image) {
@@ -33,44 +34,51 @@ const BookForm = ({
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-    
-    if (type === 'file') {
+
+    if (type === "file") {
       const file = files[0];
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        cover_image: file
+        cover_image: file,
       }));
 
       if (file) {
         const reader = new FileReader();
-        reader.onloadend = () => {
-          setCoverPreview(reader.result);
-        };
+        reader.onloadend = () => setCoverPreview(reader.result);
         reader.readAsDataURL(file);
       }
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: type === 'number' ? parseInt(value) : value
+        [name]: type === "number" ? parseInt(value) : value,
       }));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleBookSubmit = async (e) => {
     e.preventDefault();
-    
-    const submitData = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (formData[key] !== null && formData[key] !== undefined) {
-        submitData.append(key, formData[key]);
-      }
-    });
 
-    onSubmit(submitData);
+    if (
+      !formData.title ||
+      !formData.author ||
+      !formData.category ||
+      !formData.isbn ||
+      !formData.publisher ||
+      !formData.publication_year ||
+      !formData.description ||
+      !formData.total_copies
+    ) {
+      alert("Harap isi semua field yang wajib!");
+      return;
+    }
+
+    if (typeof onSubmit === "function") {
+      onSubmit(formData);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="book-form">
+    <form onSubmit={handleBookSubmit} className="book-form">
       <div className="form-row">
         <Input
           label="Title"
@@ -79,9 +87,7 @@ const BookForm = ({
           value={formData.title}
           onChange={handleChange}
           required
-          className="form-input"
         />
-        
         <Input
           label="Author"
           type="text"
@@ -89,7 +95,6 @@ const BookForm = ({
           value={formData.author}
           onChange={handleChange}
           required
-          className="form-input"
         />
       </div>
 
@@ -101,9 +106,7 @@ const BookForm = ({
           value={formData.isbn}
           onChange={handleChange}
           required
-          className="form-input"
         />
-        
         <Input
           label="Publisher"
           type="text"
@@ -111,7 +114,6 @@ const BookForm = ({
           value={formData.publisher}
           onChange={handleChange}
           required
-          className="form-input"
         />
       </div>
 
@@ -123,11 +125,7 @@ const BookForm = ({
           value={formData.publication_year}
           onChange={handleChange}
           required
-          min="1000"
-          max={new Date().getFullYear()}
-          className="form-input"
         />
-        
         <Input
           label="Category"
           type="text"
@@ -135,7 +133,6 @@ const BookForm = ({
           value={formData.category}
           onChange={handleChange}
           required
-          className="form-input"
         />
       </div>
 
@@ -146,8 +143,6 @@ const BookForm = ({
         value={formData.total_copies}
         onChange={handleChange}
         required
-        min="1"
-        className="form-input"
       />
 
       <div className="form-group">
@@ -158,7 +153,6 @@ const BookForm = ({
           onChange={handleChange}
           required
           rows="4"
-          className="form-textarea"
         />
       </div>
 
@@ -169,7 +163,6 @@ const BookForm = ({
           name="cover_image"
           onChange={handleChange}
           accept="image/*"
-          className="form-input"
         />
         {coverPreview && (
           <div className="cover-preview">
@@ -178,11 +171,7 @@ const BookForm = ({
         )}
       </div>
 
-      <Button
-        type="submit"
-        loading={loading}
-        className="submit-btn"
-      >
+      <Button type="submit" loading={loading}>
         {submitText}
       </Button>
     </form>
